@@ -304,126 +304,101 @@ public class Graph<T extends Comparable> implements Serializable {
         return output;
     }
 
-    public int[][] createAdjMatrix() throws Exception {
-        int[][] matrix = new int[adjList.size()][adjList.size()];
+    private Map<T, Integer> d = new LinkedHashMap<>();
 
-        int i = 0;
-        int j;
+    public void setD() {
         for (Map.Entry<T, Map<T, Integer>> entry:
              adjList.entrySet()) {
-            j = 0;
-            for (Map.Entry<T, Map<T, Integer>> innerEntry:
-                 adjList.entrySet()) {
-                if (adjList.get(entry.getKey()).containsKey(innerEntry.getKey())) {
-                    for (Map.Entry<T, Integer> newEntry:
-                         entry.getValue().entrySet()) {
-                        if (newEntry.getKey().equals(innerEntry.getKey())) {
-                            if (newEntry.getValue() < 0) {
-                                throw new Exception("Встретился отрицательный вес. " +
-                                        "Недопустимое значение для условия задачи");
-                            }
-                            int weight = newEntry.getValue();
-                            matrix[i][j] = weight;
-                        }
-                    }
-                } else {
-                    matrix[i][j] = 0;
-                }
-                j++;
-            }
-            i++;
+            d.put(entry.getKey(), Integer.MAX_VALUE);
         }
-        return matrix;
     }
 
-//    public long[] dijkstra(T vertex, int[] p, int[][] matrix) {
-//
-//        nov.put(vertex, false);
-//
-//        int v = (int) vertex;
-//        // матрица для вершин, указывающая их веса
-//        int[][] c = new int[adjList.size()][adjList.size()];
-//        for (int i = 0; i < adjList.size(); i++) {
-//            for (int j = 0; j < adjList.size(); j++) {
-//                if (matrix[i][j] == 0 || i == j) {
-//                    c[i][j] = Integer.MAX_VALUE;
-//                } else {
-//                    c[i][j] = matrix[i][j];
-//                }
-//            }
-//        }
-//
-//        // массив d будет возвращаться, что это за массив?
-//        long[] d = new long[adjList.size()];
-//        // для чего нужен массив p?
-//        p = new int[adjList.size()];
-//
-//        // тут в массив d добавили значение из массива с (матрица с весами)
-//        // т.е. мы создали массив, в который запихиваем по очереди значение веса для вершин,
-//        // а в массив p записываем все вершины?
-//        for (int i = 0; i < adjList.size(); i++) {
-//            if (i != v) {
-//                d[i] = c[v][i];
-//                p[i] = v;
-//            }
-//        }
-//
-//        for (int i = 0; i < adjList.size() - 1; i++) {
-//            long min = Integer.MAX_VALUE;
-//            for (int j = 0; j < adjList.size(); j++) {
-//                if (nov.get(j) && d[j] < min) {
-//                    min = d[j];
-//                    w = j;
-//                }
-//            }
-//
-//            nov.put(w, false);
-//        }
-//
-//
-//
-//
-//        return d;
-//    }
+    public Integer dijkstra(T vertex) {
 
+        d.put(vertex, 0);
 
-    public long[] dijkstra(T vertex, int[][] adjMatrix) {
-        // помечаем вершину как просмотренную
         nov.put(vertex, false);
-        int v = (int) vertex;
 
-        // далее создаем двумерный массив, в котором будут храниться значения весов, если существует путь из A в B,
-        // то записываем вес, иначе записываем максимальное значение (бесконечность)
-        int[][] matrixWithWeight = new int[adjList.size()][adjList.size()];
-        for (int i = 0; i < adjList.size(); i++) {
-            for (int j = 0; j < adjList.size(); j++) {
-                if (adjMatrix[i][j] != 0) {
-                    matrixWithWeight[i][j] = adjMatrix[i][j];
-                } else {
-                    matrixWithWeight[i][j] = Integer.MAX_VALUE;
+        for (Map.Entry<T, Map<T, Integer>> entry:
+             adjList.entrySet()) {
+            while (entry.getKey().equals(vertex)) {
+                for (Map.Entry<T, Integer> innerEntry :
+                        entry.getValue().entrySet()) {
+                    if (adjList.get(entry.getKey()).containsKey(innerEntry.getKey())) {
+                        if (d.get(innerEntry.getKey()) > d.get(entry.getKey()) + innerEntry.getValue()) {
+                            d.put(innerEntry.getKey(), d.get(entry.getKey()) + innerEntry.getValue());
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        List<Map.Entry<T, Integer>> sortedList = new ArrayList<>(d.entrySet());
+
+        Collections.sort(sortedList, new Comparator<Map.Entry<T, Integer>>() {
+            @Override
+            public int compare(Map.Entry<T, Integer> o1, Map.Entry<T, Integer> o2) {
+                return o1.getValue()-o2.getValue();
+            }
+        });
+
+
+        for (Map.Entry<T, Integer> sortedEntry:
+             sortedList) {
+            if (!sortedEntry.getKey().equals(vertex)) {
+                for (Map.Entry<T, Map<T, Integer>> entry :
+                        adjList.entrySet()) {
+                    if (sortedEntry.getKey().equals(entry.getKey())) {
+                        for (Map.Entry<T, Integer> innerEntry :
+                                entry.getValue().entrySet()) {
+                            if (adjList.get(entry.getKey()).containsKey(innerEntry.getKey()) && nov.get(innerEntry.getKey())) {
+                                if (d.get(innerEntry.getKey()) > d.get(entry.getKey()) + innerEntry.getValue()) {
+                                    d.put(innerEntry.getKey(), d.get(entry.getKey()) + innerEntry.getValue());
+                                    nov.put(entry.getKey(), false);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // необходимо записать в массив dist[] все пути из заданной вершины в остальные
-        Set<Integer> dist = new LinkedHashSet<>();
-        Set<Integer> tops = new LinkedHashSet<>();
-        for (int i = 0; i < adjList.size(); i++) {
-            if (i != v) {
-                dist.add(matrixWithWeight[v][i]);
-                tops.add(v);
+
+        int min = Integer.MAX_VALUE;
+        for (Map.Entry<T, Integer> entry:
+             d.entrySet()) {
+            if (entry.getValue() < min && !entry.getKey().equals(vertex) && !nov.get(entry.getKey())) {
+                min = entry.getValue();
             }
         }
 
-        // нужно создать переменную min, в которой так же будет значение бесконечности
+        return min;
+    }
 
-        // из нашей заданной вершины, проверяем существование пути (можно через foreach или через матрицу смежности)
-        //  если путь существует, и значение веса (стоимость пути) меньше min, то меняем значение min и запоминаем текущую вершину
-        
+    public Map<T, Integer> bellmanFord(T vertex) throws Exception {
 
-        // вершину помечаем как просмотренную
+        if (!adjList.containsKey(vertex)) {
+            throw new Exception("Вершина задана неверно");
+        }
 
-        // в цикле для каждой вершины определяем кратча
-        return null;
+        d.put(vertex, 0);
+
+        for (Map.Entry<T, Map<T, Integer>> entry :
+                adjList.entrySet()) {
+            for (Map.Entry<T, Integer> innerEntry :
+                    entry.getValue().entrySet()) {
+                if (d.get(entry.getKey()) < Integer.MAX_VALUE) {
+                    if (d.get(innerEntry.getKey()) > (d.get(entry.getKey()) + innerEntry.getValue())) {
+                        d.put(innerEntry.getKey(), d.get(entry.getKey()) + innerEntry.getValue());
+                    }
+                }
+            }
+        }
+        return d;
+    }
+
+    public void floyd(T vertex) {
+
     }
 }

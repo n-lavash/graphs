@@ -6,6 +6,7 @@ public class Console {
         createWeightedNotOrientationGraph();
         createNotWeightedOrientationGraph();
         createWeightedOrientationGraph();
+        testGraph();
 
         testConsole();
     }
@@ -92,6 +93,27 @@ public class Console {
             graph.addEdge("Краснодар", "Саратов", 17);
             consoleOutput(graph);
             saveFile(graph, "WeightedOrientationGraph.bin");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    static void testGraph() {
+        Graph<String> graph = new Graph<>(true, true);
+
+        try {
+            graph.addEdge("Саратов", "Москва", 10);
+            graph.addEdge("Саратов", "Казань", 10);
+            graph.addEdge("Саратов", "Астрахань", 30);
+            graph.addEdge("Саратов", "Новый Свет", 50);
+            graph.addEdge("Москва", "Саратов", 10);
+            graph.addEdge("Москва", "Новый Свет", 30);
+            graph.addEdge("Москва", "Астрахань", 10);
+            graph.addEdge("Новый Свет", "Казань", 40);
+            graph.addEdge("Новый Свет", "Астрахань", 20);
+            graph.addEdge("Астрахань", "Москва", 10);
+
+            saveFile(graph, "TestGraph.bin");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

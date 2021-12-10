@@ -186,20 +186,82 @@ public class Homework {
                 10. Эксцентриситет вершины — максимальное расстояние из всех минимальных расстояний от других вершин до данной вершины. Найти радиус графа — минимальный из эксцентриситетов его вершин.
                 Алгоритм Дейкстры""");
 
-        // создаем матрицу смежности для нашего списка
-        try {
-            int[][] matrixAdj = graph.createAdjMatrix();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (Map.Entry<String, Map<String, Integer>> entry:
+             graph.getAdjList().entrySet()) {
+            for (Map.Entry<String, Integer> innerEntry:
+                 entry.getValue().entrySet()) {
+                if (innerEntry.getValue() < 0) {
+                    System.out.println("В графе есть дуги с отрицательными весами. Выход из программы");
+                    return;
+                }
+            }
         }
+
+        List<Integer> output = new ArrayList<>();
+
+        for (Map.Entry<String, Map<String, Integer>> entry:
+             graph.getAdjList().entrySet()) {
+            if (AdditionalClass.checkingForIsolation(entry.getKey(), graph)) {
+                graph.novSet();
+                graph.setD();
+                output.add(graph.dijkstra(entry.getKey()));
+            }
+        }
+
+        Collections.sort(output);
+
+        System.out.println("Радиус графа: " + output.get(output.size()-1));
+
     }
 
     static void IVb(Graph<String> graph) {
-        System.out.println("просто хочу сказать, что котики рулят...но реализации тут нет");
+        System.out.println("""
+                Текст задания:
+                14. Вывести все кратчайшие пути из вершины u.
+                Алгоритм Беллмана-Форда""");
+
+
+        System.out.println("\nВведите вершину");
+        Scanner scanner = new Scanner(System.in);
+        String vertex = scanner.nextLine();
+        Map<String, Integer> output = null;
+        try {
+            graph.setD();
+            output = graph.bellmanFord(vertex);
+            System.out.println("\nВсе кратчайшие пути из вершины " + vertex + ":");
+            for (Map.Entry<String, Integer> entry:
+                    output.entrySet()) {
+                if (!entry.getKey().equals(vertex)) {
+                    System.out.println(entry.getKey() + " " + entry.getValue());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     static void IVc(Graph<String> graph) {
-        System.out.println("нет тут ничего, кто делать то будет пушкин что ли");
+        System.out.println("""
+                Текст задания
+                3. Определить, есть ли в графе вершина, каждая из минимальных стоимостей пути от которой до остальных не превосходит N.
+                Алгоритм Флойда""");
+
+        System.out.println("\nВведите N");
+        Scanner scanner = new Scanner(System.in);
+        int N = scanner.nextInt();
+
+        /*
+        делаем Флойда и в нем нужно посмотреть сразу подходит ли под условие? или в этом методе?
+         */
+    }
+
+    static void V(Graph<String> graph) {
+        System.out.println("""
+                Текст задания:
+                Решить задачу на нахождение максимального потока любым алгоритмом""");
+
+        // тут пока хз че делать блинб
     }
 }
