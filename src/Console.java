@@ -113,6 +113,7 @@ public class Console {
             graph.addEdge("Новый Свет", "Астрахань", 20);
             graph.addEdge("Астрахань", "Москва", 10);
 
+
             saveFile(graph, "TestGraph.bin");
         } catch (Exception e) {
             System.out.println(e.getMessage());

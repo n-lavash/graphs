@@ -252,6 +252,7 @@ public class Homework {
         Scanner scanner = new Scanner(System.in);
         int N = scanner.nextInt();
 
+
         /*
         делаем Флойда и в нем нужно посмотреть сразу подходит ли под условие? или в этом методе?
          */
