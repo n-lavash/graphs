@@ -95,6 +95,7 @@ public class Console {
             saveFile(graph, "WeightedOrientationGraph.bin");
         } catch (Exception e) {
             System.out.println(e.getMessage());
+
         }
     }
 
