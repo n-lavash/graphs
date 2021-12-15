@@ -105,16 +105,41 @@ public class Console {
             graph.addEdge("Саратов", "Москва", 10);
             graph.addEdge("Саратов", "Казань", 10);
             graph.addEdge("Саратов", "Астрахань", 30);
-            graph.addEdge("Саратов", "Новый Свет", 50);
+            graph.addEdge("Саратов", "Новый Свет", -50);
             graph.addEdge("Москва", "Саратов", 10);
             graph.addEdge("Москва", "Новый Свет", 30);
             graph.addEdge("Москва", "Астрахань", 10);
             graph.addEdge("Новый Свет", "Казань", 40);
-            graph.addEdge("Новый Свет", "Астрахань", 20);
+            graph.addEdge("Новый Свет", "Астрахань", -20);
             graph.addEdge("Астрахань", "Москва", 10);
 
 
             saveFile(graph, "TestGraph.bin");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    static void testGraph2() {
+        Graph<String> graph = new Graph<>(true, true);
+
+        try {
+            graph.addVertex("Новосибирск");
+
+            graph.addEdge("Саратов", "Москва", 2);
+            graph.addEdge("Саратов", "Астрахань", 4);
+            graph.addEdge("Саратов", "Киров", -1);
+            graph.addEdge("Москва", "Астрахань", 1);
+            graph.addEdge("Москва", "Киров", 4);
+            graph.addEdge("Астрахань", "Новый Свет", 2);
+            graph.addEdge("Киров", "Судак", -3);
+            graph.addEdge("Судак", "Казань", 6);
+            graph.addEdge("Судак", "Самара", 1);
+            graph.addEdge("Казань", "Новый Свет", 3);
+            graph.addEdge("Самара", "Саратов", 2);
+            graph.addEdge("Самара", "Новый Свет", 2);
+
+            saveFile(graph, "TestGraph2.bin");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

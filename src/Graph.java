@@ -386,20 +386,98 @@ public class Graph<T extends Comparable> implements Serializable {
 
         for (Map.Entry<T, Map<T, Integer>> entry :
                 adjList.entrySet()) {
-            for (Map.Entry<T, Integer> innerEntry :
-                    entry.getValue().entrySet()) {
-                if (d.get(entry.getKey()) < Integer.MAX_VALUE) {
-                    if (d.get(innerEntry.getKey()) > (d.get(entry.getKey()) + innerEntry.getValue())) {
-                        d.put(innerEntry.getKey(), d.get(entry.getKey()) + innerEntry.getValue());
+            while (entry.getKey().equals(vertex)) {
+                for (Map.Entry<T, Integer> innerEntry :
+                        entry.getValue().entrySet()) {
+                    if (d.get(entry.getKey()) < Integer.MAX_VALUE) {
+                        if (d.get(innerEntry.getKey()) > (d.get(entry.getKey()) + innerEntry.getValue())) {
+                            d.put(innerEntry.getKey(), d.get(entry.getKey()) + innerEntry.getValue());
+                        }
                     }
                 }
+                break;
+            }
+        }
+
+        for (Map.Entry<T, Map<T, Integer>> entry :
+                adjList.entrySet()) {
+            while (entry.getKey().equals(vertex)) {
+                for (Map.Entry<T, Integer> innerEntry :
+                        entry.getValue().entrySet()) {
+                    if (d.get(entry.getKey()) < Integer.MAX_VALUE) {
+                        if (d.get(innerEntry.getKey()) > (d.get(entry.getKey()) + innerEntry.getValue())) {
+                            throw new Exception("Граф имеет отрицательные циклы");
+                        }
+                    }
+                }
+                break;
             }
         }
         return d;
     }
 
-    public void floyd(T vertex) {
+    public int[][] createMatrix(List<T> list) {
+        int[][] matrix = new int[adjList.size()][adjList.size()];
+        int i = 0;
+        for (Map.Entry<T, Map<T, Integer>> entry:
+             adjList.entrySet()) {
+            list.add(entry.getKey());
+            int j = 0;
+            for (Map.Entry<T, Integer> innerEntry:
+                 entry.getValue().entrySet()) {
+                matrix[i][j] = innerEntry.getValue();
+                j++;
+            }
+            i++;
+        }
+        return matrix;
+    }
 
+    public List<T> floyd(int N) {
 
+        List<T> list = new ArrayList<>();
+        int[][] shortWay = createMatrix(list);
+
+        int i = 0;
+        for (Map.Entry<T, Map<T, Integer>> entry:
+             adjList.entrySet()) {
+            int j = 0;
+            for (Map.Entry<T, Map<T, Integer>> innerEntry:
+                 adjList.entrySet()) {
+                if (!adjList.get(entry.getKey()).containsKey(innerEntry.getKey())) {
+                    shortWay[i][j] = Integer.MAX_VALUE;
+                }
+                if (entry.getKey().equals(innerEntry.getKey())) {
+                    shortWay[i][j] = 0;
+                }
+                j++;
+            }
+            i++;
+        }
+
+        for (int k = 0; k < shortWay.length; k++) {
+            for (int x = 0; x < shortWay.length; x++) {
+                for (int y = 0; y < shortWay.length; y++) {
+                    shortWay[x][y] = Math.min(shortWay[x][y], shortWay[x][k] + shortWay[k][y]);
+                }
+            }
+        }
+
+        boolean check = false;
+        List<T> output = new ArrayList<>();
+        for (int x = 0; x < shortWay.length; x++) {
+            for (int y = 0; y < shortWay.length; y++) {
+                if (shortWay[x][y] < N) {
+                    check = true;
+                } else {
+                    check = false;
+                }
+            }
+            if (check) {
+                output.add(list.get(x));
+            }
+        }
+
+        return output;
     }
 }

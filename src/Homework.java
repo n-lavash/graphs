@@ -252,10 +252,16 @@ public class Homework {
         Scanner scanner = new Scanner(System.in);
         int N = scanner.nextInt();
 
+        List<String> output = graph.floyd(N);
 
-        /*
-        делаем Флойда и в нем нужно посмотреть сразу подходит ли под условие? или в этом методе?
-         */
+        if (output.isEmpty()) {
+            System.out.println("\nТаких вершин не существует");
+        } else {
+            System.out.println("\nВершины:");
+            for (int i = 0; i < output.size(); i++) {
+                System.out.print(output.get(i) + " ");
+            }
+        }
     }
 
     static void V(Graph<String> graph) {
